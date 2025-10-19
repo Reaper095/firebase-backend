@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Backend Test Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .output {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196f3;
+            font-size: 13px;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .file-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .api-url {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .api-url input {
+            width: 100%;
+            padding: 8px;
+            font-family: monospace;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Backend Test Client</h1>
+        <p class="subtitle">Test your authentication and file upload endpoints</p>
+
+        <div class="api-url">
+            <strong>⚙️ API Base URL:</strong>
+            <input type="text" id="apiUrl" value="http://localhost:3000" placeholder="http://localhost:3000">
+            <span id="connectionStatus" class="status-badge status-disconnected">Not Connected</span>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="section">
+            <h2>🔐 Authentication</h2>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" placeholder="test@example.com" value="test@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" placeholder="password123" value="password123">
+            </div>
+            
+            <div class="form-group">
+                <label>Display Name (for signup):</label>
+                <input type="text" id="displayName" placeholder="Test User" value="Test User">
+            </div>
+
+            <button onclick="signup()">Sign Up</button>
+            <button onclick="login()">Login</button>
+            
+            <div class="output" id="authOutput">Authentication results will appear here...</div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="section">
+            <h2>📤 File Upload</h2>
+            
+            <div class="info">
+                <strong>ℹ️ Note:</strong> You must be logged in to upload files. Your token will be used automatically.
+            </div>
+
+            <div class="form-group">
+                <label>Select File (max 5MB):</label>
+                <input type="file" id="fileInput">
+            </div>
+
+            <button onclick="uploadFile()" id="uploadBtn">Upload File</button>
+            
+            <div class="output" id="uploadOutput">Upload results will appear here...</div>
+        </div>
+
+        <!-- File List Section -->
+        <div class="section">
+            <h2>📁 My Files</h2>
+            
+            <button onclick="fetchFiles()">Refresh File List</button>
+            
+            <div class="file-list" id="fileList">
+                <div class="output">Click "Refresh File List" to load your files...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let userId = null;
+
+        function getApiUrl() {
+            return document.getElementById('apiUrl').value.trim();
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${getApiUrl()}/api/health`);
+                const data = await response.json();
+                
+                const statusBadge = document.getElementById('connectionStatus');
+                if (response.ok) {
+                    statusBadge.textContent = 'Connected';
+                    statusBadge.className = 'status-badge status-connected';
+                } else {
+                    statusBadge.textContent = 'Connection Error';
+                    statusBadge.className = 'status-badge status-disconnected';
+                }
+            } catch (error) {
+                const statusBadge = document.getElementById('connectionStatus');
+                statusBadge.textContent = 'Not Connected';
+                statusBadge.className = 'status-badge status-disconnected';
+            }
+        }
+
+        // Check connection on load and URL change
+        window.addEventListener('load', checkConnection);
+        document.getElementById('apiUrl').addEventListener('change', checkConnection);
+
+        async function signup() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const displayName = document.getElementById('displayName').value;
+            const output = document.getElementById('authOutput');
+
+            output.textContent = 'Creating account...';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, displayName })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    output.innerHTML = `<span class="success">✓ Signup Successful!</span>\n\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    output.innerHTML = `<span class="error">✗ Signup Failed</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Network Error</span>\n\n${error.message}`;
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const output = document.getElementById('authOutput');
+
+            output.textContent = 'Logging in...';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.uid; // Use UID as token for simplified testing
+                    userId = data.user.uid;
+                    output.innerHTML = `<span class="success">✓ Login Successful!</span>\n\n` +
+                        `User ID: ${data.user.uid}\n` +
+                        `Email: ${data.user.email}\n` +
+                        `Display Name: ${data.user.displayName}\n` +
+                        `Custom Token: ${data.customToken.substring(0, 50)}...\n\n` +
+                        `✓ Authentication ready! You can now upload files.\n` +
+                        `(Using UID for simplified testing)`;
+                    
+                    // Enable upload button
+                    document.getElementById('uploadBtn').disabled = false;
+                } else {
+                    output.innerHTML = `<span class="error">✗ Login Failed</span>\n\n${JSON.stringify(data, null, 2)}`;
+                    authToken = null;
+                    userId = null;
+                }
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Network Error</span>\n\n${error.message}`;
+                authToken = null;
+                userId = null;
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const output = document.getElementById('uploadOutput');
+
+            if (!authToken) {
+                output.innerHTML = `<span class="error">✗ Please login first!</span>`;
+                return;
+            }
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                output.innerHTML = `<span class="error">✗ Please select a file!</span>`;
+                return;
+            }
+
+            const file = fileInput.files[0];
+            
+            if (file.size > 5 * 1024 * 1024) {
+                output.innerHTML = `<span class="error">✗ File too large! Maximum size is 5MB.</span>`;
+                return;
+            }
+
+            output.textContent = `Uploading ${file.name}...`;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    output.innerHTML = `<span class="success">✓ Upload Successful!</span>\n\n` +
+                        `File ID: ${data.file.id}\n` +
+                        `Name: ${data.file.name}\n` +
+                        `Size: ${(data.file.size / 1024).toFixed(2)} KB\n` +
+                        `URL: ${data.file.url}\n\n` +
+                        `Click "Refresh File List" to see your file.`;
+                    
+                    // Clear file input
+                    fileInput.value = '';
+                } else {
+                    output.innerHTML = `<span class="error">✗ Upload Failed</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Network Error</span>\n\n${error.message}`;
+            }
+        }
+
+        async function fetchFiles() {
+            const fileList = document.getElementById('fileList');
+
+            if (!authToken) {
+                fileList.innerHTML = '<div class="output"><span class="error">✗ Please login first!</span></div>';
+                return;
+            }
+
+            fileList.innerHTML = '<div class="output">Loading files...</div>';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/files`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.files.length === 0) {
+                        fileList.innerHTML = '<div class="output">No files uploaded yet. Upload your first file above!</div>';
+                    } else {
+                        let html = `<div class="output"><span class="success">Found ${data.count} file(s)</span></div>`;
+                        
+                        data.files.forEach(file => {
+                            const uploadDate = file.uploadedAt ? new Date(file.uploadedAt._seconds * 1000).toLocaleString() : 'Unknown';
+                            const fileSize = file.fileSize ? (file.fileSize / 1024).toFixed(2) : 'Unknown';
+                            
+                            html += `
+                                <div class="file-item">
+                                    <div class="file-info">
+                                        <div class="file-name">📄 ${file.fileName}</div>
+                                        <div class="file-meta">
+                                            ${fileSize} KB • ${file.mimeType || 'Unknown type'} • ${uploadDate}
+                                        </div>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button onclick="window.open('${file.publicUrl}', '_blank')">View</button>
+                                        <button class="delete-btn" onclick="deleteFile('${file.id}', '${file.fileName}')">Delete</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        fileList.innerHTML = html;
+                    }
+                } else {
+                    fileList.innerHTML = `<div class="output"><span class="error">✗ Failed to load files</span>\n\n${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                fileList.innerHTML = `<div class="output"><span class="error">✗ Network Error</span>\n\n${error.message}</div>`;
+            }
+        }
+
+        async function deleteFile(fileId, fileName) {
+            if (!confirm(`Are you sure you want to delete "${fileName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/files/${fileId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('File deleted successfully!');
+                    fetchFiles(); // Refresh the file list
+                } else {
+                    alert(`Delete failed: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Network error: ${error.message}`);
+            }
+        }
+
+        // Disable upload button initially
+        document.getElementById('uploadBtn').disabled = true;
+    </script>
+</body>
+</html>
