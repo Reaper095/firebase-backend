@@ -6,6 +6,23 @@ A complete Node.js backend system with Firebase integration featuring user authe
 ![Firebase](https://img.shields.io/badge/Firebase-Admin%20SDK-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
+## 🖼️ Screenshots
+
+### 🔐 Login Page
+![Login Page](assets/screenshots/Login.png)
+
+### 📤 Login Successful Page
+![Login successful Page](assets/screenshots/Login_successfull.png)
+
+### 📤 Upload Successful Page
+![Upload successfull Page](assets/screenshots/Upload_successfull.png)
+
+### 📤 PDF Stored Page
+![PDF_stored Page](assets/screenshots/PDF_stored.png)
+
+### 📤 File Created Page
+![File created Page](assets/screenshots/File_created.png)
+
 ## ✨ Features
 
 - ✅ **User Authentication** - Signup and Login with Firebase Auth
@@ -23,7 +40,6 @@ A complete Node.js backend system with Firebase integration featuring user authe
 - Node.js v14 or higher
 - npm or yarn
 - Firebase account (free tier works fine)
-
 ### Installation
 
 1. **Clone the repository**
