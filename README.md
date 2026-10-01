@@ -34,8 +34,10 @@ A complete Node.js backend system with Firebase integration featuring user authe
 - ✅ **Test Client** - HTML test interface included
 
 ## Test Section
-Just Testing GitHub CLI.
-2nd Trial
+- Just Testing GitHub CLI.
+- 2nd Trial
+- 3rd Trial
+
 
 ## 🚀 Quick Start
 
